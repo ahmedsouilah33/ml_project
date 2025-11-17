@@ -9,48 +9,62 @@ on:
 jobs:
   build-and-run:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣ Cloner le dépôt
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Configurer Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
+      # 3️⃣ Installer les dépendances
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt
 
+      # 4️⃣ Préparer les données
       - name: Prepare data
         run: |
+          source venv/bin/activate
           python main.py --prepare
 
+      # 5️⃣ Entraîner le modèle
       - name: Train model
         run: |
+          source venv/bin/activate
           python main.py --train
 
+      # 6️⃣ Évaluer le modèle
       - name: Evaluate model
         run: |
+          source venv/bin/activate
           python main.py --evaluate
 
+      # 7️⃣ Prédictions sur le test final
       - name: Predict
         run: |
+          source venv/bin/activate
           python main.py --predict
 
-      - name: Upload model artifact
-        if: success()
+      # 8️⃣ Sauvegarder le modèle comme artefact
+      - name: Upload trained model
         uses: actions/upload-artifact@v4
         with:
-          name: knn_model
-          path: knn_model.pkl
+          name: trained-model
+          path: naive_bayes_loan_model.pkl   # ou knn_model.pkl selon ton script
+
+      # 9️⃣ Sauvegarder les prédictions comme artefact
+      - name: Upload predictions CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: predictions
+          path: predictions.csv              # ou le nom de ton fichier de sortie
+
 
