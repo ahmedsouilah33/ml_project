@@ -3,14 +3,8 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Importer toutes les fonctions et variables globales depuis model_pipeline.py
-from model_pipeline import (
-    prepare_data,
-    train_model,
-    evaluate_model,
-    predict,
-    save_model,
-    load_model,
-)
+from model_pipeline import (evaluate_model, load_model, predict, prepare_data,
+                            save_model, train_model)
 
 
 def main():
@@ -30,7 +24,7 @@ def main():
 
     # Étape 2: Entraînement du modèle
     print("2. Entraînement du modèle KNN...")
-    model, scaler = train_model(data["X_train"], data["y_train"], n_neighbors=3)
+    model, scaler = train_model(data["X_train"], data["y_train"], n_neighbors=19)
     print()
 
     # Étape 3: Évaluation du modèle
@@ -47,12 +41,13 @@ def main():
 
     # Étape 5: Sauvegarde du modèle
     print("5. Sauvegarde du modèle...")
-    save_model(model, scaler, "knn_loan_model.pkl")
+    # Sauvegarder aussi la liste des colonnes utilisées à l'entraînement
+    save_model(model, scaler, "knn_loan_model.pkl", trained_columns=data["X_train"].columns)
     print()
 
     # Étape 6: Chargement du modèle et vérification
     print("6. Test de chargement du modèle...")
-    loaded_model, loaded_scaler = load_model("knn_loan_model.pkl")
+    loaded_model, loaded_scaler, trained_columns = load_model("knn_loan_model.pkl")
     test_predictions = predict(loaded_model, loaded_scaler, data["X_test"].head())
     print(f"Prédictions de test avec modèle chargé: {test_predictions}\n")
 

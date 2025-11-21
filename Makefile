@@ -65,7 +65,6 @@ format:
 # 8. Nettoyage des fichiers générés
 # ----------------------------
 clean:
-	rm -rf $(VENV)
 	rm -f *.pkl
 	rm -f *.csv
 	rm -rf __pycache__
@@ -84,5 +83,15 @@ watch:
         --patterns=".py;.csv" \
         --recursive \
         --command='make all'
+# ----------------------------
+# 11. Sécurité
+# ----------------------------
+security:
+	bandit -r . -ll
 
+
+deploy:
+	python3 -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
+
+	
 .PHONY: install prepare train evaluate predict test lint format clean all watch
