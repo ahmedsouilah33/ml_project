@@ -5,6 +5,10 @@ import pandas as pd
 from model_pipeline import (
     preprocess_data,
     load_model,
+    prepare_data,
+    train_model, 
+    evaluate_model,
+    save_model, 
     predict
 )
 
@@ -77,6 +81,51 @@ def predict_loan(data: LoanInput):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {e}")
 
+
+class RetrainParams(BaseModel):
+    n_neighbors: int = 15
+# ----------------------------
+# ENDPOINT : retrain du modèle
+# ----------------------------
+@app.post("/retrain")
+def retrain_model(params: RetrainParams):
+
+    global model, scaler, trained_columns
+
+    try:
+        # 1. Charger et préparer les données
+        data = prepare_data("data/train.csv", "data/test.csv")
+
+        X_train = data["X_train"]
+        y_train = data["y_train"]
+        X_test = data["X_test"]
+        y_test = data["y_test"]
+
+        # 2. Entraîner le nouveau modèle
+        model, scaler = train_model(X_train, y_train, n_neighbors=params.n_neighbors)
+
+        # 3. Évaluer
+        eval_result = evaluate_model(model, scaler, X_test, y_test)
+
+        # 4. Sauvegarder
+        save_model(
+            model=model,
+            scaler=scaler,
+            file_path=MODEL_PATH,
+            trained_columns=X_train.columns
+        )
+
+        # 5. Recharger dans l’API
+        model, scaler, trained_columns = load_model(MODEL_PATH)
+
+        return {
+            "message": "Model retrained successfully.",
+            "accuracy": eval_result["accuracy"],
+            "n_neighbors": params.n_neighbors
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # --------------------------------------
 # Health check
