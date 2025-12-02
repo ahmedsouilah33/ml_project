@@ -17,7 +17,7 @@ preprocessing_params = {}
 
 def encode_categorical_features(df, is_train=True):
     """
-    Encoder les variables catégorielles du DataFrame.
+    Encoder les variables catégorielles du DataFrameeee.
     """
     df_encoded = df.copy()
 
