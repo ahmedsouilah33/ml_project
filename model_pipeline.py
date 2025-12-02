@@ -84,6 +84,8 @@ def encode_categorical_features(df, is_train=True):
 
     if "Loan_Amount_Term" in df_encoded.columns:
         df_encoded.drop("Loan_Amount_Term", axis=1, inplace=True)
+       # df_encoded["Loan_Amount_Term"] = df_encoded["Loan_Amount_Term"].fillna(360)
+
 
     return df_encoded
 

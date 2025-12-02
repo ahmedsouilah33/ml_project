@@ -93,5 +93,14 @@ security:
 deploy:
 	python3 -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
 
-	
-.PHONY: install prepare train evaluate predict test lint format clean all watch
+
+	# ----------------------------
+# 12. Lancer l'application Flask
+# ----------------------------
+flask:
+	@echo "=== Running Flask app on http://127.0.0.1:5000 ==="
+	FLASK_APP=flask_app.py FLASK_ENV=development $(VENV)/bin/flask run --host=0.0.0.0 --port=5000
+
+# -----
+
+.PHONY: install prepare train evaluate predict test lint format clean all watch security deploy flask api dev
